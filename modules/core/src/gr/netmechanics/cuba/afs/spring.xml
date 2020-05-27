@@ -5,5 +5,4 @@
     <!-- Annotation-based beans -->
     <context:component-scan base-package="gr.netmechanics.cuba.afs"/>
 
-	<bean name="cuba_FileStorage" class="gr.netmechanics.cuba.afs.blob.AzureFileStorage"/>
 </beans>
