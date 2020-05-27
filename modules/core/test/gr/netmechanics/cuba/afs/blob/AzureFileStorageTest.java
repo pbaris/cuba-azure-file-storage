@@ -1,5 +1,8 @@
 package gr.netmechanics.cuba.afs.blob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -7,69 +10,66 @@ import java.util.Date;
 import com.haulmont.cuba.core.entity.FileDescriptor;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Configuration;
-import com.haulmont.cuba.testsupport.TestContainer;
 import gr.netmechanics.cuba.afs.AzureFileStorageTestContainer;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Panos Bariamis (pbaris)
  */
-//@Ignore
 public class AzureFileStorageTest {
-    private static final String FILE_CONTENT = "This text is for Azure Storage Blobe.";
+    private static final String FILE_CONTENT = "This text is for Azure Storage Blob.";
 
-    @ClassRule
-    public static TestContainer cont = AzureFileStorageTestContainer.Common.INSTANCE;
+    @RegisterExtension
+    static AzureFileStorageTestContainer cont = AzureFileStorageTestContainer.Common.INSTANCE;
 
-    private AzureFileStorage fileStorageAPI;
+    private static AzureFileStorage fileStorageAPI;
+    private static FileDescriptor fileDescr;
+    private static FileDescriptor fileDescr2;
 
-    private FileDescriptor fileDescr;
-    private FileDescriptor fileDescr2;
-
-    @Before
-    public void setUp() throws Exception {
-        fileDescr = new FileDescriptor();
+    @BeforeAll
+    static void setUp() {
+        fileDescr = cont.metadata().create(FileDescriptor.class);
         fileDescr.setCreateDate(new Date());
         fileDescr.setSize((long) FILE_CONTENT.length());
-        fileDescr.setName("AmazonFileStorageTest");
+        fileDescr.setName("AzureFileStorageTest");
         fileDescr.setExtension("txt");
 
-        fileDescr2 = new FileDescriptor();
+        fileDescr2 = cont.metadata().create(FileDescriptor.class);
         fileDescr2.setCreateDate(new Date());
         fileDescr2.setSize((long) FILE_CONTENT.length());
-        fileDescr2.setName("AmazonFileStorageTest");
+        fileDescr2.setName("AzureFileStorageTest");
 
         fileStorageAPI = new AzureFileStorage();
         fileStorageAPI.config = AppBeans.get(Configuration.class).getConfig(AzureFileStorageConfig.class);
+        fileStorageAPI.refreshBlobContainerClient();
     }
 
     @Test
-    public void testWithExtension() throws Exception {
+    void testWithExtension() throws Exception {
         fileStorageAPI.saveFile(fileDescr, FILE_CONTENT.getBytes());
 
         InputStream inputStream = fileStorageAPI.openStream(fileDescr);
-        Assert.assertEquals(FILE_CONTENT, IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+        assertEquals(FILE_CONTENT, IOUtils.toString(inputStream, StandardCharsets.UTF_8));
 
         boolean fileExists = fileStorageAPI.fileExists(fileDescr);
-        Assert.assertTrue(fileExists);
+        assertTrue(fileExists);
 
-//        fileStorageAPI.removeFile(fileDescr);
+        fileStorageAPI.removeFile(fileDescr);
     }
 
     @Test
-    public void testWithoutExtension() throws Exception {
+    void testWithoutExtension() throws Exception {
         fileStorageAPI.saveFile(fileDescr2, FILE_CONTENT.getBytes());
 
         InputStream inputStream = fileStorageAPI.openStream(fileDescr2);
-        Assert.assertEquals(FILE_CONTENT, IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+        assertEquals(FILE_CONTENT, IOUtils.toString(inputStream, StandardCharsets.UTF_8));
 
         boolean fileExists = fileStorageAPI.fileExists(fileDescr2);
-        Assert.assertTrue(fileExists);
+        assertTrue(fileExists);
 
-//        fileStorageAPI.removeFile(fileDescr2);
+        fileStorageAPI.removeFile(fileDescr2);
     }
 }
