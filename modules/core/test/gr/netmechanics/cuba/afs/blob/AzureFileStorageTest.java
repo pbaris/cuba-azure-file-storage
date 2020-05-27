@@ -12,6 +12,7 @@ import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.Configuration;
 import gr.netmechanics.cuba.afs.AzureFileStorageTestContainer;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 /**
  * @author Panos Bariamis (pbaris)
  */
+@Ignore
 public class AzureFileStorageTest {
     private static final String FILE_CONTENT = "This text is for Azure Storage Blob.";
 
