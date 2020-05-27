@@ -27,7 +27,7 @@ subprojects {
             githubReleaseNotesFile = 'CHANGELOG.md'
             publicDownloadNumbers = true
             licenses = ["Apache-2.0"]
-            labels = ['cuba', 'cuba-platform', 'cuba-component', 'file-storage']
+            labels = ['cuba', 'cuba-platform', 'cuba-component', 'file-storage', 'azure']
         }
     }
 }
