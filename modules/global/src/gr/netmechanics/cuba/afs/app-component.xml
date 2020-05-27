@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<app-component xmlns="http://schemas.haulmont.com/cuba/app-component.xsd"
+			   dependsOn="com.haulmont.cuba">
+
+	<module name="global" blocks="*">
+		<artifact name="cubaafs-global" appJar="true"/>
+
+		<property name="cuba.persistenceConfig" value="+gr/netmechanics/cuba/afs/persistence.xml"/>
+		<property name="cuba.metadataConfig" value="+gr/netmechanics/cuba/afs/metadata.xml"/>
+		<property name="cuba.viewsConfig" value="+gr/netmechanics/cuba/afs/views.xml"/>
+		<property name="cuba.creditsConfig" value="+gr/netmechanics/cuba/afs/credits.xml"/>
+	</module>
+	<module name="core" dependsOn="global" blocks="core">
+		<artifact name="cubaafs-core" appJar="true"/>
+
+		<property name="cuba.springContextConfig" value="+gr/netmechanics/cuba/afs/spring.xml"/>
+		<property name="cuba.mainMessagePack" value="+gr.netmechanics.cuba.afs.core"/>
+	</module>
+	<module name="web" dependsOn="global" blocks="web">
+		<artifact name="cubaafs-web" appJar="true"/>
+		<artifact name="cubaafs-web" classifier="web" ext="zip" configuration="webcontent"/>
+
+		<property name="cuba.springContextConfig" value="+gr/netmechanics/cuba/afs/web-spring.xml"/>
+		<property name="cuba.dispatcherSpringContextConfig"
+				  value="+gr/netmechanics/cuba/afs/web-dispatcher-spring.xml"/>
+		<property name="cuba.windowConfig" value="+gr/netmechanics/cuba/afs/web-screens.xml"/>
+		<property name="cuba.menuConfig" value="+gr/netmechanics/cuba/afs/web-menu.xml"/>
+		<property name="cuba.permissionConfig" value="+gr/netmechanics/cuba/afs/web-permissions.xml"/>
+		<property name="cuba.mainMessagePack" value="+gr.netmechanics.cuba.afs.web"/>
+	</module>
+</app-component>
