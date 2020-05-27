@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<credits>
+
+	<items>
+		<item name="Azure SDK for Java" web="https://github.com/Azure/azure-sdk-for-java" license="mit"/>
+		<item name="Apache Tika" web="https://github.com/Azure/azure-sdk-for-java" license="apache-2.0"/>
+	</items>
+
+</credits>
