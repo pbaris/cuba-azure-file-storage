@@ -29,7 +29,7 @@ cuba {
     artifact {
         group = 'gr.netmechanics.cuba.afs'
         version = '1.0.1'
-        isSnapshot = true
+        isSnapshot = false
     }
 }
 
