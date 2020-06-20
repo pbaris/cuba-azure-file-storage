@@ -13,8 +13,9 @@ The following table shows which version of the add-on is compatible with which v
 | Platform Version | Add-on Version | Coordinates
 | ---------------- | -------------- | ------------
 | 7.2.*            | 1.0.0          | gr.netmechanics.cuba.afs:cubaafs-global:1.0.0
+| 7.2.*            | 1.0.1          | gr.netmechanics.cuba.afs:cubaafs-global:1.0.1
 
-The latest stable version is: `1.0.0`
+The latest stable version is: `1.0.1`
 
 ### From Marketplace
 You can use **CUBA Studio** / **IntelliJ IDEA** to add it to your project: choose the `CUBA -> Marketplace...` menu item,
@@ -43,7 +44,7 @@ and add custom application component to your project
 ...
 dependencies {
     ...
-    appComponent('gr.netmechanics.cuba.afs:cubaafs-global:1.0.0')
+    appComponent('gr.netmechanics.cuba.afs:cubaafs-global:1.0.1')
     ...
 }
 ...
