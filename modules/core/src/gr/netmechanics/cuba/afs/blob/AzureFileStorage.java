@@ -27,12 +27,15 @@ import com.haulmont.cuba.core.sys.events.AppContextStartedEvent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 
 /**
  * @author Panos Bariamis (pbaris)
  */
 public class AzureFileStorage implements FileStorageAPI {
+    private static Logger log = LoggerFactory.getLogger(AzureFileStorage.class);
 
     @Inject
     protected AzureFileStorageConfig config;
@@ -56,7 +59,7 @@ public class AzureFileStorage implements FileStorageAPI {
         } catch (BlobStorageException e) {
             // The container may already exist, so don't throw an error
             if (!e.getErrorCode().equals(BlobErrorCode.CONTAINER_ALREADY_EXISTS)) {
-                throw e;
+                log.warn(e.getErrorCode().toString());
 
             } else {
                 clientReference.set(blobServiceClient.getBlobContainerClient(config.getContainerName()));
@@ -82,18 +85,30 @@ public class AzureFileStorage implements FileStorageAPI {
     public void saveFile(FileDescriptor fileDescr, byte[] data) throws FileStorageException {
         checkNotNullArgument(data, "File content is null");
 
-        BlobClient blobClient = clientReference.get().getBlobClient(resolveFileName(fileDescr));
-        blobClient.upload(new ByteArrayInputStream(data), fileDescr.getSize(), true);
+        try {
+            BlobClient blobClient = clientReference.get().getBlobClient(resolveFileName(fileDescr));
+            blobClient.upload(new ByteArrayInputStream(data), fileDescr.getSize(), true);
 
-        Optional.ofNullable(getMimeType(fileDescr)).ifPresent(mimeType ->
-            blobClient.setHttpHeaders(new BlobHttpHeaders().setContentType(mimeType)));
+            Optional.ofNullable(getMimeType(fileDescr)).ifPresent(mimeType ->
+                blobClient.setHttpHeaders(new BlobHttpHeaders().setContentType(mimeType)));
+
+        } catch (NullPointerException e) {
+            String message = String.format("Could not save file %s.", getFileName(fileDescr));
+            throw new FileStorageException(FileStorageException.Type.IO_EXCEPTION, message);
+        }
     }
 
     @Override
     public void removeFile(FileDescriptor fileDescr) throws FileStorageException {
-        clientReference.get()
-            .getBlobClient(resolveFileName(fileDescr))
-            .delete();
+        try {
+            clientReference.get()
+                .getBlobClient(resolveFileName(fileDescr))
+                .delete();
+
+        } catch (NullPointerException e) {
+            String message = String.format("Could not delete file %s.", getFileName(fileDescr));
+            throw new FileStorageException(FileStorageException.Type.IO_EXCEPTION, message);
+        }
     }
 
     @Override
@@ -104,19 +119,21 @@ public class AzureFileStorage implements FileStorageAPI {
     @Override
     public byte[] loadFile(FileDescriptor fileDescr) throws FileStorageException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        clientReference.get()
-            .getBlobClient(resolveFileName(fileDescr))
-            .download(out);
-
+        try {
+            clientReference.get()
+                .getBlobClient(resolveFileName(fileDescr))
+                .download(out);
+        } catch (NullPointerException e) {
+            String message = String.format("Could not load file %s.", getFileName(fileDescr));
+            throw new FileStorageException(FileStorageException.Type.IO_EXCEPTION, message);
+        }
         return out.toByteArray();
     }
 
     @Override
     public boolean fileExists(FileDescriptor fileDescr) throws FileStorageException {
-        return clientReference.get()
-            .getBlobClient(resolveFileName(fileDescr))
-            .exists();
+        BlobContainerClient client = clientReference.get();
+        return client != null && client.getBlobClient(resolveFileName(fileDescr)).exists();
     }
 
     private String getFileName(FileDescriptor fileDescriptor) {
