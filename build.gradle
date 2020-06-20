@@ -28,7 +28,7 @@ apply(plugin: 'cuba')
 cuba {
     artifact {
         group = 'gr.netmechanics.cuba.afs'
-        version = '1.0.1'
+        version = '1.1.0'
         isSnapshot = true
     }
 }
