@@ -1,9 +1,12 @@
 buildscript {
-    ext.cubaVersion = '7.2.4'
+    ext.cubaVersion = '7.2.19'
     repositories {
         maven {
-            url 'https://dl.bintray.com/cuba-platform/main'
-
+            url 'https://repo.cuba-platform.com/content/groups/work'
+            credentials {
+                username(rootProject.hasProperty('repoUser') ? rootProject['repoUser'] : 'cuba')
+                password(rootProject.hasProperty('repoPass') ? rootProject['repoPass'] : 'cuba123')
+            }
         }
         jcenter()
 
@@ -28,8 +31,14 @@ apply(plugin: 'cuba')
 cuba {
     artifact {
         group = 'gr.netmechanics.cuba.afs'
-        version = '1.0.1'
+        version = '1.1.0'
         isSnapshot = false
+    }
+
+    uploadRepository {
+        url = 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        user = rootProject.hasProperty('ossrhUsername') ? rootProject['ossrhUsername'] : "Unknown"
+        password = rootProject.hasProperty('ossrhPassword') ? rootProject['ossrhPassword'] : "Unknown"
     }
 }
 
@@ -45,7 +54,7 @@ configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'cuba')
 
     dependencies {
-        compile('com.azure:azure-storage-blob:12.6.1')
+        compile('com.azure:azure-storage-blob:12.17.0')
         compile('org.apache.tika:tika-core:1.24.1')
 
         testCompile('org.junit.jupiter:junit-jupiter-api:5.5.2')
@@ -175,6 +184,5 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
         }
     }
 }
-restart.finalizedBy start
 
-apply from: 'publish.gradle';
+restart.finalizedBy start
